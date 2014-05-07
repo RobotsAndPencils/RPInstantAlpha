@@ -29,6 +29,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 @property (nonatomic, strong) NSColor *minColor;
 @property (nonatomic, strong) NSColor *maxColor;
 @property (nonatomic) double threshold;
+@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef alphaImageRef;
 
 @end
 
@@ -68,6 +69,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         [self setNeedsDisplay];
 
         [self.undoManager registerUndoWithTarget:self selector:@selector(setImage:) object:self.image];
+        [self.undoManager endUndoGrouping];
         self.image = [self.maskedImage copy];
 
         [NSCursor unhide];
@@ -111,9 +113,6 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
     CGContextSaveGState(context);
 
-    // Draw the original image first
-    [self.maskedImage drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeCopy fraction:1.0 respectFlipped:YES hints:nil];
-
     // Get the source image
     CGImageRef imageRef = [self.image CGImageForProposedRect:&bounds context:[NSGraphicsContext currentContext] hints:nil];
 
@@ -127,21 +126,37 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     // Draw the masked image in a context *with* alpha now, so that when we pass it back it will be transparent
     CGImageRef imageRefWithAlpha = [self newCGImageWithAlphaFromCGImage:imageRefWithoutAlpha];
 
-    // Create a transparent image for drawing when done dragging
-    self.maskedImage = [[NSImage alloc] initWithCGImage:maskedImageRef size:self.image.size];
-//    self.maskedImage = [self maskedImage:maskedImageRef FromAlphaOfImage:maskedImageRef];
+    // Get the alpha of the newly-masked image
+    CGImageRef alphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:maskedImageRef invert:YES];
 
-    // Draw the translucent highlight overlay and then draw the color-masked image overtop
+    // Combine it with the existing alpha mask
+    // Invocation-based undo because we're working with a CoreGraphics type
+    [[self.undoManager prepareWithInvocationTarget:self] setAlphaImageRef:self.alphaImageRef];
+    self.alphaImageRef = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:alphaOnlyImageRef withAlphaOnlyCGImage:self.alphaImageRef];
+    
+    // Create a masked image with the combined mask
+    CGImageRef mask = [self newCGImageMaskWithCGImage:self.alphaImageRef];
+    self.maskedImage = [self maskedCGImage:imageRefWithAlpha withCGImageMask:mask];
+
+    // Actual drawing now
+    // Draw the original image first
+    [self.image drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
+
+    // Draw the translucent highlight overlay
+    CGImageRef invertedMask = [self newAlphaOnlyCGImageWithCGImage:alphaOnlyImageRef invert:NO];
+    CGContextClipToMask(context, bounds, invertedMask);
     CGContextSetRGBFillColor(context, 0.0, 1.0, 0.0, 0.5);
     CGContextFillRect(context, actualImageRect);
-    CGContextDrawImage(context, actualImageRect, maskedImageRef);
 
     // Cleanup
     CGContextRestoreGState(context);
 
     CGImageRelease(imageRefWithoutAlpha);
     CGImageRelease(imageRefWithAlpha);
+    CGImageRelease(alphaOnlyImageRef);
     CGImageRelease(maskedImageRef);
+    CGImageRelease(mask);
+    CGImageRelease(invertedMask);
     free(colorMasking);
 }
 
@@ -178,6 +193,10 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     [self updateThresholdColors];
     [self setNeedsDisplay];
+
+    // When the user performs undo, we need to undo both the change to self.image and the change to the alpha mask simultaneously
+    // This call is balanced with endUndoGrouping in the mouseUp NSEvent handler setup in this class's init
+    [self.undoManager beginUndoGrouping];
 
     [NSCursor hide];
 
@@ -234,46 +253,72 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     return imageRect;
 }
 
-- (NSImage *)maskedImage:(CGImageRef)imageRef withMaskImageRef:(CGImageRef)maskImageRef {
+- (NSImage *)maskedCGImage:(CGImageRef)imageRef withCGImageMask:(CGImageRef)maskImageRef {
     CGImageRef maskedImage = CGImageCreateWithMask(imageRef, maskImageRef);
 	NSImage *result = [[NSImage alloc] initWithCGImage:maskedImage size:NSMakeSize(CGImageGetWidth(maskedImage), CGImageGetHeight(maskedImage))];
+    CGImageRelease(maskedImage);
+    
     return result;
 }
 
-- (CGImageRef)maskImageRefFromAlphaOfImage:(CGImageRef)maskImageRef {
-    // Original RGBA image
-    float width = CGImageGetWidth(maskImageRef);
-    float height = CGImageGetHeight(maskImageRef);
-    
-    // Make a bitmap context that's only 1 alpha channel
-    NSInteger bytesPerRow = CGImageGetBytesPerRow(maskImageRef) / 4;
-    unsigned char *alphaData = calloc(bytesPerRow * height, sizeof(unsigned char));
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
-    CGContextRef alphaOnlyContext = CGBitmapContextCreate(alphaData, width, height, 8, bytesPerRow, colorSpace, (CGBitmapInfo)kCGImageAlphaOnly);
-    
-    // Draw the RGBA image into the alpha-only context.
-    CGContextDrawImage(alphaOnlyContext, CGRectMake(0, 0, width, height), maskImageRef);
-    
-    // Walk the pixels and invert the alpha value. This lets you colorize the opaque shapes in the original image.
-    // If you want to do a traditional mask (where the opaque values block) just get rid of these loops.
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            unsigned char val = alphaData[y * bytesPerRow + x];
-            val = 255 - val;
-            alphaData[y * bytesPerRow + x] = val;
-        }
-    }
-    
-    CGImageRef alphaMaskImage = CGBitmapContextCreateImage(alphaOnlyContext);
-    CGContextRelease(alphaOnlyContext);
-    free(alphaData);
+- (CGImageRef)newCGImageMaskWithCGImage:(CGImageRef)imageRef {
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
     
     // Make a mask
-    CGImageRef finalMaskImage = CGImageMaskCreate(width, height, CGImageGetBitsPerComponent(alphaMaskImage), CGImageGetBitsPerPixel(alphaMaskImage), CGImageGetBytesPerRow(alphaMaskImage), CGImageGetDataProvider(alphaMaskImage), NULL, YES);
-    CGImageRelease(alphaMaskImage);
-    
-    CFAutorelease(finalMaskImage);
+    CGImageRef finalMaskImage = CGImageMaskCreate((size_t)width, (size_t)height, CGImageGetBitsPerComponent(imageRef), CGImageGetBitsPerPixel(imageRef), CGImageGetBytesPerRow(imageRef), CGImageGetDataProvider(imageRef), NULL, YES);
+
     return finalMaskImage;
+}
+
+- (CGImageRef)newAlphaOnlyCGImageWithCGImage:(CGImageRef)imageRef invert:(BOOL)invert {
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
+    size_t bytesPerPixel = CGImageGetBitsPerPixel(imageRef) / 8;
+    size_t bytesPerRow = CGImageGetBytesPerRow(imageRef) / bytesPerPixel;
+
+    unsigned char *alphaData = calloc(bytesPerRow * height, sizeof(unsigned char));
+    CGContextRef alphaOnlyContext = CGBitmapContextCreate(alphaData, width, height, 8, bytesPerRow, NULL, (CGBitmapInfo)kCGImageAlphaOnly);
+
+    CGContextDrawImage(alphaOnlyContext, CGRectMake(0, 0, width, height), imageRef);
+
+    if (invert) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                unsigned char val = alphaData[y * bytesPerRow + x];
+                val = 255 - val;
+                alphaData[y * bytesPerRow + x] = val;
+            }
+        }
+    }
+
+    CGImageRef alphaMaskImage = CGBitmapContextCreateImage(alphaOnlyContext);
+
+    CGContextRelease(alphaOnlyContext);
+    free(alphaData);
+
+    return alphaMaskImage;
+}
+
+- (CGImageRef)newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:(CGImageRef)alphaOnlyImageRef withAlphaOnlyCGImage:(CGImageRef)existingAlphaOnlyImageRef {
+    size_t width = CGImageGetWidth(alphaOnlyImageRef);
+    size_t height = CGImageGetHeight(alphaOnlyImageRef);
+    size_t bytesPerRow = width;
+
+    unsigned char *alphaData = calloc(bytesPerRow * height, sizeof(unsigned char));
+    CGContextRef alphaOnlyContext = CGBitmapContextCreate(alphaData, width, height, 8, bytesPerRow, NULL, (CGBitmapInfo)kCGImageAlphaOnly);
+
+    CGContextSetBlendMode(alphaOnlyContext, kCGBlendModeSourceAtop);
+    CGContextDrawImage(alphaOnlyContext, CGRectMake(0, 0, width, height), alphaOnlyImageRef);
+    if (existingAlphaOnlyImageRef != NULL) {
+        CGContextDrawImage(alphaOnlyContext, CGRectMake(0, 0, width, height), existingAlphaOnlyImageRef);
+    }
+    CGImageRef alphaMaskImage = CGBitmapContextCreateImage(alphaOnlyContext);
+
+    CGContextRelease(alphaOnlyContext);
+    free(alphaData);
+
+    return alphaMaskImage;
 }
 
 - (NSColor *)colorWithComponentsBetweenRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue bound:(CGFloat)bound {
@@ -311,12 +356,12 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     CGContextRef alphaContext = CGBitmapContextCreate(NULL, (size_t)width, (size_t)height, 8, (size_t)width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
     CGContextDrawImage(alphaContext, CGRectMake(0.0, 0.0, width, height), imageRef);
-    CGImageRef ImageRefWithAlpha = CGBitmapContextCreateImage(alphaContext);
+    CGImageRef imageRefWithAlpha = CGBitmapContextCreateImage(alphaContext);
 
     CGColorSpaceRelease(colorSpace);
     CGContextRelease(alphaContext);
 
-    return ImageRefWithAlpha;
+    return imageRefWithAlpha;
 }
 
 - (CGFloat *)newColorMaskingArrayWithStartColor:(NSColor *)startColor endColor:(NSColor *)endColor {
@@ -340,6 +385,38 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     free(components);
 
     return colorMasking;
+}
+
+// For debugging purposes it can be useful to visualize an the alpha channel as grayscale
+// This method will return a grayscale CGImageRef of the alpha channel from the argument
+- (CGImageRef)newCGImageWithAlphaOfCGImageAsGrayscale:(CGImageRef)imageRef {
+    if (imageRef == NULL) return NULL;
+
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
+    size_t bitsPerComponent = 8;
+    size_t bitsPerPixel = bitsPerComponent;
+    size_t bytesPerRow = CGImageGetBytesPerRow(imageRef);
+
+    // Get data for alpha-only version of the image
+    CGContextRef alphaOnlyContext = CGBitmapContextCreate(NULL, width, height, bitsPerComponent, bytesPerRow, NULL, (CGBitmapInfo)kCGImageAlphaOnly);
+    CGContextDrawImage(alphaOnlyContext, CGRectMake(0, 0, width, height), imageRef);
+    CGImageRef alphaOnlyImage = CGBitmapContextCreateImage(alphaOnlyContext);
+
+    CFDataRef alphaData = CGDataProviderCopyData(CGImageGetDataProvider(alphaOnlyImage));
+    CGImageRelease(alphaOnlyImage);
+
+    // Create new grayscale image with alpha data
+    CGDataProviderRef provider = CGDataProviderCreateWithCFData(alphaData);
+    CGColorSpaceRef grayColorSpace = CGColorSpaceCreateDeviceGray();
+    CGImageRef grayscaleImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, width, grayColorSpace, (CGBitmapInfo)kCGImageAlphaNone, provider, NULL, YES, kCGRenderingIntentDefault);
+
+    CFRelease(alphaData);
+    CGDataProviderRelease(provider);
+    CGColorSpaceRelease(grayColorSpace);
+    CGContextRelease(alphaOnlyContext);
+
+    return grayscaleImage;
 }
 
 @end
