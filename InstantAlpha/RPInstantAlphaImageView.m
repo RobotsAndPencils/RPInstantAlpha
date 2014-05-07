@@ -26,18 +26,10 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 @property (nonatomic, copy) void (^selectionChanged)(NSPoint mousePoint, CGFloat threshold);
 @property (nonatomic, copy) void (^selectionEnded)(NSImage *image);
 
-@property (nonatomic) CGFloat red;
-@property (nonatomic) CGFloat green;
-@property (nonatomic) CGFloat blue;
-@property (nonatomic) CGFloat minRed;
-@property (nonatomic) CGFloat minGreen;
-@property (nonatomic) CGFloat minBlue;
-@property (nonatomic) CGFloat maxRed;
-@property (nonatomic) CGFloat maxGreen;
-@property (nonatomic) CGFloat maxBlue;
 @property (nonatomic, strong) NSColor *minColor;
 @property (nonatomic, strong) NSColor *maxColor;
 @property (nonatomic) double threshold;
+
 @end
 
 @implementation RPInstantAlphaImageView
@@ -62,21 +54,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         self.currentPoint = mousePoint;
         self.threshold = threshold;
 
-        // Calculate the min/max colors with the threshold
-        // 100% threshold should cover 0.0f - 255.0f for all components
-        [self.pickedColor getRed:&_red green:&_green blue:&_blue alpha:NULL];
-
-        self.minRed = map(0.0, 1.0, self.red, 0.0, self.threshold);
-        self.minGreen = map(0.0, 1.0, self.green, 0.0, self.threshold);
-        self.minBlue = map(0.0, 1.0, self.blue, 0.0, self.threshold);
-
-        self.maxRed = map(0.0, 1.0, self.red, 1.0, self.threshold);
-        self.maxGreen = map(0.0, 1.0, self.green, 1.0, self.threshold);
-        self.maxBlue = map(0.0, 1.0, self.blue, 1.0, self.threshold);
-
-        self.minColor = [NSColor colorWithDeviceRed:self.minRed green:self.minGreen blue:self.minBlue alpha:1.0];
-        self.maxColor = [NSColor colorWithDeviceRed:self.maxRed green:self.maxGreen blue:self.maxBlue alpha:1.0];
-
+        [self updateThresholdColors];
         [self setNeedsDisplay];
 
         if (self.selectionChanged) self.selectionChanged(self.currentPoint, self.threshold);
@@ -120,59 +98,40 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
 
 - (void)drawMaskedImage {
-    NSRect actualImageRect = [self imageBounds];
+    NSRect actualImageRect = [self imageFrame];
     [self.maskedImage drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
 }
 
 - (void)drawHighlightedImage {
     if (!self.pickedColor) return;
 
+    NSRect actualImageRect = [self imageFrame];
+    NSRect bounds = self.bounds;
+
     CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
     CGContextSaveGState(context);
 
     // Draw the original image first
-    NSRect actualImageRect = [self imageBounds];
-    [[NSColor clearColor] set];
-    NSRectFill(self.bounds);
     [self.maskedImage drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeCopy fraction:1.0 respectFlipped:YES hints:nil];
-
-    NSRect bounds = self.bounds;
 
     // Get the source image
     CGImageRef imageRef = [self.image CGImageForProposedRect:&bounds context:[NSGraphicsContext currentContext] hints:nil];
 
     // Draw it in an alpha-less context so we can use CGImageCreateWithMaskingColors
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef maskContext = CGBitmapContextCreate(NULL, bounds.size.width, bounds.size.height, 8, bounds.size.width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipLast);
-    CGContextDrawImage(maskContext, bounds, imageRef);
-    imageRef = CGBitmapContextCreateImage(maskContext);
+    CGImageRef imageRefWithoutAlpha = [self newCGImageWithoutAlphaFromCGImage:imageRef];
 
     // Mask the original image based on the min/max colors
-    NSArray *colours = @[ self.minColor, self.maxColor ];
-    NSInteger colorCount = [colours count];
-    NSInteger componentCount = [self.pickedColor numberOfComponents] - 1; // Skip alpha
-
-    CGFloat *colorMasking = malloc((size_t)(colorCount * componentCount * sizeof(CGFloat)));
-    CGFloat *components = malloc((size_t)(componentCount * sizeof(CGFloat)));
-    for (NSInteger componentIndex = 0; componentIndex < componentCount; componentIndex += 1) {
-        for (NSInteger colorIndex = 0; colorIndex < colorCount; colorIndex += 1) {
-            [colours[colorIndex] getComponents:components];
-            CGFloat value = components[componentIndex];
-            value *= 255.0;
-            colorMasking[componentIndex * colorCount + colorIndex] = value;
-        }
-    }
-    CGImageRef maskedImageRef = CGImageCreateWithMaskingColors(imageRef, colorMasking);
+    CGFloat *colorMasking = [self newColorMaskingArrayWithStartColor:self.minColor endColor:self.maxColor];
+    CGImageRef maskedImageRef = CGImageCreateWithMaskingColors(imageRefWithoutAlpha, colorMasking);
 
     // Draw the masked image in a context *with* alpha now, so that when we pass it back it will be transparent
-    maskContext = CGBitmapContextCreate(NULL, bounds.size.width, bounds.size.height, 8, bounds.size.width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
-    CGContextDrawImage(maskContext, bounds, maskedImageRef);
-    maskedImageRef = CGBitmapContextCreateImage(maskContext);
+    CGImageRef imageRefWithAlpha = [self newCGImageWithAlphaFromCGImage:imageRefWithoutAlpha];
 
+    // Create a transparent image for drawing when done dragging
     self.maskedImage = [[NSImage alloc] initWithCGImage:maskedImageRef size:self.image.size];
 //    self.maskedImage = [self maskedImage:maskedImageRef FromAlphaOfImage:maskedImageRef];
 
-    // Draw the translucent overlay and then draw the color-masked image overtop
+    // Draw the translucent highlight overlay and then draw the color-masked image overtop
     CGContextSetRGBFillColor(context, 0.0, 1.0, 0.0, 0.5);
     CGContextFillRect(context, actualImageRect);
     CGContextDrawImage(context, actualImageRect, maskedImageRef);
@@ -180,10 +139,9 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     // Cleanup
     CGContextRestoreGState(context);
 
+    CGImageRelease(imageRefWithoutAlpha);
+    CGImageRelease(imageRefWithAlpha);
     CGImageRelease(maskedImageRef);
-    CGColorSpaceRelease(colorSpace);
-    CGContextRelease(maskContext);
-    free(components);
     free(colorMasking);
 }
 
@@ -202,7 +160,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
 - (void)mouseDown:(NSEvent *)theEvent {
     NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] toView:self];
-    BOOL mouseInPhoto = CGRectContainsPoint([self imageBounds], mousePoint);
+    BOOL mouseInPhoto = CGRectContainsPoint([self imageFrame], mousePoint);
     if (!mouseInPhoto) return;
 
     self.hasFinishedDragging = NO;
@@ -212,20 +170,31 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     self.threshold = 0.0;
 
     // In order to get the color at the mouse coordinate, we need to scale the mouse point to the point in the original image rect
-    NSRect imageRect = [self imageBounds];
+    NSRect imageRect = [self imageFrame];
     CGFloat imageXScale = imageRect.size.width / self.image.size.width;
     CGFloat imageYScale = imageRect.size.height / self.image.size.height;
     mousePoint = NSMakePoint((mousePoint.x - imageRect.origin.x) / imageXScale, (mousePoint.y - imageRect.origin.y) / imageYScale);
     self.pickedColor = [self sampleColorAtPoint:mousePoint];
 
-    [NSCursor hide];
+    [self updateThresholdColors];
+    [self setNeedsDisplay];
 
-//    [self setNeedsDisplay];
+    [NSCursor hide];
 
     if (self.selectionStarted) self.selectionStarted();
 }
 
 #pragma mark - Helpers
+
+// Calculate the min/max colors with the threshold
+// 100% threshold should cover 0.0f - 255.0f for all components
+- (void)updateThresholdColors {
+    CGFloat red, green, blue;
+    [self.pickedColor getRed:&red green:&green blue:&blue alpha:NULL];
+
+    self.minColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:0.0];
+    self.maxColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:1.0];
+}
 
 - (NSColor *)sampleColorAtPoint:(NSPoint)point {
     NSBitmapImageRep *imageRepresentation = [[NSBitmapImageRep alloc] initWithData:[self.image TIFFRepresentation]];
@@ -253,7 +222,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     }
 }
 
-- (NSRect)imageBounds {
+- (NSRect)imageFrame {
     NSSize size = [[self image] size];
     NSRect bounds = [self bounds];
     CGFloat scale = [self imageScale];
@@ -305,6 +274,72 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     
     CFAutorelease(finalMaskImage);
     return finalMaskImage;
+}
+
+- (NSColor *)colorWithComponentsBetweenRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue bound:(CGFloat)bound {
+    NSAssert1(bound >= 0.0 && bound <= 1.0, @"Bound argument should be between 0.0 and 1.0 inclusively, was %f", bound);
+
+    CGFloat adjustedRed, adjustedGreen, adjustedBlue;
+
+    adjustedRed = map(0.0, 1.0, red, bound, self.threshold);
+    adjustedGreen = map(0.0, 1.0, green, bound, self.threshold);
+    adjustedBlue = map(0.0, 1.0, blue, bound, self.threshold);
+
+    NSColor *adjustedColor = [NSColor colorWithDeviceRed:adjustedRed green:adjustedGreen blue:adjustedBlue alpha:1.0];
+    return adjustedColor;
+}
+
+- (CGImageRef)newCGImageWithoutAlphaFromCGImage:(CGImageRef)imageRef {
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGFloat width = CGImageGetWidth(imageRef);
+    CGFloat height = CGImageGetHeight(imageRef);
+
+    CGContextRef alphalessContext = CGBitmapContextCreate(NULL, (size_t)width, (size_t)height, 8, (size_t)width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipLast);
+    CGContextDrawImage(alphalessContext, CGRectMake(0.0, 0.0, width, height), imageRef);
+    CGImageRef imageRefWithoutAlpha = CGBitmapContextCreateImage(alphalessContext);
+
+    CGColorSpaceRelease(colorSpace);
+    CGContextRelease(alphalessContext);
+
+    return imageRefWithoutAlpha;
+}
+
+- (CGImageRef)newCGImageWithAlphaFromCGImage:(CGImageRef)imageRef {
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGFloat width = CGImageGetWidth(imageRef);
+    CGFloat height = CGImageGetHeight(imageRef);
+
+    CGContextRef alphaContext = CGBitmapContextCreate(NULL, (size_t)width, (size_t)height, 8, (size_t)width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    CGContextDrawImage(alphaContext, CGRectMake(0.0, 0.0, width, height), imageRef);
+    CGImageRef ImageRefWithAlpha = CGBitmapContextCreateImage(alphaContext);
+
+    CGColorSpaceRelease(colorSpace);
+    CGContextRelease(alphaContext);
+
+    return ImageRefWithAlpha;
+}
+
+- (CGFloat *)newColorMaskingArrayWithStartColor:(NSColor *)startColor endColor:(NSColor *)endColor {
+    NSAssert1([startColor numberOfComponents], @"startColor must be an RGBA color with 4 components, had %ld components", (long)[startColor numberOfComponents]);
+    NSAssert1([endColor numberOfComponents], @"endColor must be an RGBA color with 4 components, had %ld components", (long)[endColor numberOfComponents]);
+
+    NSArray *colours = @[ startColor, endColor ];
+    NSInteger colorCount = [colours count];
+    NSInteger componentCount = [startColor numberOfComponents] - 1; // Skip alpha
+
+    CGFloat *colorMasking = malloc((size_t)(colorCount * componentCount * sizeof(CGFloat)));
+    CGFloat *components = malloc((size_t)(componentCount * sizeof(CGFloat)));
+    for (NSUInteger componentIndex = 0; componentIndex < componentCount; componentIndex += 1) {
+        for (NSUInteger colorIndex = 0; colorIndex < colorCount; colorIndex += 1) {
+            [colours[colorIndex] getComponents:components];
+            CGFloat value = components[componentIndex];
+            value *= 255.0;
+            colorMasking[componentIndex * colorCount + colorIndex] = value;
+        }
+    }
+    free(components);
+
+    return colorMasking;
 }
 
 @end
