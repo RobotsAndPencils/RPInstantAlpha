@@ -30,6 +30,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 @property (nonatomic, strong) NSColor *maxColor;
 @property (nonatomic) double threshold;
 @property (nonatomic, strong) __attribute__((NSObject)) CGImageRef alphaImageRef;
+@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef newAlphaImageRef;
 
 @end
 
@@ -68,8 +69,12 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         self.hasFinishedDragging = YES;
         [self setNeedsDisplay];
 
+        // Invocation-based undo because we're working with a CoreGraphics type
+        CGImageRetain(self.alphaImageRef);
+        [[self.undoManager prepareWithInvocationTarget:self] undoAlphaImageRef:self.alphaImageRef];
         [self.undoManager registerUndoWithTarget:self selector:@selector(setImage:) object:self.image];
-        [self.undoManager endUndoGrouping];
+
+        self.alphaImageRef = self.newAlphaImageRef;
         self.image = [self.maskedImage copy];
 
         [NSCursor unhide];
@@ -82,9 +87,28 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     return self;
 }
 
+- (void)dealloc {
+    CGImageRelease(_alphaImageRef);
+    CGImageRelease(_newAlphaImageRef);
+    self.alphaImageRef = NULL;
+    self.newAlphaImageRef = NULL;
+}
+
+#pragma mark - Properties
+
 - (void)setImage:(NSImage *)newImage {
     [super setImage:newImage];
     self.maskedImage = newImage;
+}
+
+// This is a special "setter" for undoing alpha mask changes
+// We need to retain the CGImageRef alpha mask so it exists until the undo invocation occurs, this happens before registering the undo invocation
+// But we don't then want to retain it *again* (+2) as it would be in a normal setter, since it would never have a balancing release
+- (void)undoAlphaImageRef:(CGImageRef)alphaImageRef {
+    if (_alphaImageRef == alphaImageRef) return;
+    
+    CGImageRelease(_alphaImageRef);
+    _alphaImageRef = alphaImageRef;
 }
 
 #pragma mark - Drawing
@@ -130,12 +154,15 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGImageRef alphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:maskedImageRef invert:YES];
 
     // Combine it with the existing alpha mask
-    // Invocation-based undo because we're working with a CoreGraphics type
-    [[self.undoManager prepareWithInvocationTarget:self] setAlphaImageRef:self.alphaImageRef];
-    self.alphaImageRef = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:alphaOnlyImageRef withAlphaOnlyCGImage:self.alphaImageRef];
+    // Note that we own the CGImageRef returned from this method and it already has a retain count of +1
+    // If we were to assign it directly to the property it would have a retain count of +2 (it's retained again in the synthesized setter)
+    // We need to be able to release it here to prevent a leak
+    CGImageRef newMask = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:alphaOnlyImageRef withAlphaOnlyCGImage:self.alphaImageRef];
+    self.newAlphaImageRef = newMask;
+    CGImageRelease(newMask);
     
     // Create a masked image with the combined mask
-    CGImageRef mask = [self newCGImageMaskWithCGImage:self.alphaImageRef];
+    CGImageRef mask = [self newCGImageMaskWithCGImage:newMask];
     self.maskedImage = [self maskedCGImage:imageRefWithAlpha withCGImageMask:mask];
 
     // Actual drawing now
@@ -193,10 +220,6 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     [self updateThresholdColors];
     [self setNeedsDisplay];
-
-    // When the user performs undo, we need to undo both the change to self.image and the change to the alpha mask simultaneously
-    // This call is balanced with endUndoGrouping in the mouseUp NSEvent handler setup in this class's init
-    [self.undoManager beginUndoGrouping];
 
     [NSCursor hide];
 
