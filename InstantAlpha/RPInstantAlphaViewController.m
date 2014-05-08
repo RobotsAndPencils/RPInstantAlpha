@@ -25,7 +25,6 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 @property (nonatomic, strong) NSWindow *thresholdLabelWindow;
 
 @property (nonatomic, strong) NSImage *originalImage;
-@property (nonatomic, strong) NSImage *editedImage;
 
 @property (nonatomic, copy) void(^completion)(NSImage *);
 
@@ -39,7 +38,6 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     if (!self) return nil;
     
     _originalImage = image;
-    _editedImage = [image copy];
     
     _completion = completion;
     
@@ -85,10 +83,9 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
         [weakSelf moveThresholdWindowToMousePoint:mousePoint];
     } selectionEnded:^(NSImage *image) {
         [weakSelf.thresholdLabelWindow close];
-        weakSelf.editedImage = image;
     }];
     
-    self.imageView.image = _editedImage;
+    self.imageView.image = [self.originalImage copy];
     self.imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.view addSubview:self.imageView];
 }
@@ -103,12 +100,11 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 }
 
 - (void)reset {
-    self.editedImage = [self.originalImage copy];
-    self.imageView.image = self.editedImage;
+    self.imageView.image = [self.originalImage copy];
 }
 
 - (void)done {
-    if (self.completion) self.completion(self.editedImage);
+    if (self.completion) self.completion(self.imageView.image);
 }
 
 @end
