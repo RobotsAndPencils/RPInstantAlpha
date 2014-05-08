@@ -24,6 +24,7 @@
 		CAB6A8241914AF0E00576A36 /* RPInstantAlphaImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB6A8231914AF0E00576A36 /* RPInstantAlphaImageView.m */; };
 		CAB6A82F191832B200576A36 /* RPThresholdLabelView.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB6A82E191832B200576A36 /* RPThresholdLabelView.m */; };
 		CAB6A83219183C5800576A36 /* RPThresholdLabelWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB6A83119183C5800576A36 /* RPThresholdLabelWindow.m */; };
+		CACFC316191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CACFC315191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,8 @@
 		CAB6A82E191832B200576A36 /* RPThresholdLabelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPThresholdLabelView.m; sourceTree = "<group>"; };
 		CAB6A83019183C5800576A36 /* RPThresholdLabelWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPThresholdLabelWindow.h; sourceTree = "<group>"; };
 		CAB6A83119183C5800576A36 /* RPThresholdLabelWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPThresholdLabelWindow.m; sourceTree = "<group>"; };
+		CACFC314191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPInstantAlphaInstructionsWindow.h; sourceTree = "<group>"; };
+		CACFC315191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaInstructionsWindow.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +151,8 @@
 				CAB6A82E191832B200576A36 /* RPThresholdLabelView.m */,
 				CAB6A83019183C5800576A36 /* RPThresholdLabelWindow.h */,
 				CAB6A83119183C5800576A36 /* RPThresholdLabelWindow.m */,
+				CACFC314191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.h */,
+				CACFC315191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.m */,
 			);
 			path = InstantAlpha;
 			sourceTree = "<group>";
@@ -289,6 +294,7 @@
 				CAB6A7F619149E0600576A36 /* RPAppDelegate.m in Sources */,
 				CAB6A81819149F6C00576A36 /* RPInstantAlphaViewController.m in Sources */,
 				CAB6A7EF19149E0600576A36 /* main.m in Sources */,
+				CACFC316191BCD57006E0EE6 /* RPInstantAlphaInstructionsWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
