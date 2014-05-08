@@ -267,9 +267,18 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
 
 - (NSImage *)maskedCGImage:(CGImageRef)imageRef withCGImageMask:(CGImageRef)maskImageRef {
-    CGImageRef maskedImage = CGImageCreateWithMask(imageRef, maskImageRef);
-	NSImage *result = [[NSImage alloc] initWithCGImage:maskedImage size:NSMakeSize(CGImageGetWidth(maskedImage), CGImageGetHeight(maskedImage))];
-    CGImageRelease(maskedImage);
+    size_t width = CGImageGetWidth(imageRef);
+    size_t height = CGImageGetHeight(imageRef);
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(NULL, width, height, 8, width * 4, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    CGContextClipToMask(context, CGRectMake(0.0, 0.0, width, height), maskImageRef);
+    CGContextDrawImage(context, CGRectMake(0.0, 0.0, width, height), imageRef);
+    CGImageRef maskedImageRef = CGBitmapContextCreateImage(context);
+    
+	NSImage *result = [[NSImage alloc] initWithCGImage:maskedImageRef size:NSMakeSize(width, height)];
+    CGColorSpaceRelease(colorSpace);
+    CGImageRelease(maskedImageRef);
     
     return result;
 }
