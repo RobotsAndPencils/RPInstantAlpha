@@ -19,8 +19,7 @@
 
 @implementation RPAppDelegate
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
-{
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     NSImage *image = [NSImage imageNamed:@"Sailing"];
     self.instantAlphaViewController = [[RPInstantAlphaViewController alloc] initWithImage:image completion:^(NSImage *image) {
         NSLog(@"Edited image: %@", image);

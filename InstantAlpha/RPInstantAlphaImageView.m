@@ -29,14 +29,16 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 @property (nonatomic, assign) double selectionThreshold;
 
 @property (nonatomic, strong) NSImage *transientImage;
-@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef alphaMask;
+// Using an NSImage to wrap the non-transient alphaMask CGImageRef
+// This makes managing the image's lifecycle much easier when dealing with the NSUndoManager
+@property (nonatomic, strong) NSImage *alphaMask;
 @property (nonatomic, strong) __attribute__((NSObject)) CGImageRef transientAlphaMask;
 
 @end
 
 @implementation RPInstantAlphaImageView
 
-- (instancetype)initWithFrame:(NSRect)frame selectionStarted:(void (^)())selectionStarted selectionChanged:(void (^)(NSPoint mousePoint, CGFloat threshold))selectionChanged selectionEnded:(void (^)(NSImage *))selectionEnded {
+- (instancetype)initWithFrame:(NSRect)frame selectionStarted:(void (^)(NSPoint mousePoint))selectionStarted selectionChanged:(void (^)(NSPoint mousePoint, CGFloat threshold))selectionChanged selectionEnded:(void (^)(NSImage *))selectionEnded {
     self = [super initWithFrame:frame];
     if (!self) {
         return nil;
@@ -69,20 +71,14 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         if (self.hasFinishedDragging) return event;
 
         self.hasFinishedDragging = YES;
-        [self setNeedsDisplay];
-
-        // Invocation-based undo because we're working with a CoreGraphics type
-        CGImageRetain(self.alphaMask);
-        [[self.undoManager prepareWithInvocationTarget:self] undoAlphaImageRef:self.alphaMask];
-        [self.undoManager registerUndoWithTarget:self selector:@selector(setImage:) object:self.image];
-
-        self.alphaMask = self.transientAlphaMask;
         self.image = [self.transientImage copy];
+        self.alphaMask = [[NSImage alloc] initWithCGImage:self.transientAlphaMask size:NSMakeSize(CGImageGetWidth(self.transientAlphaMask), CGImageGetHeight(self.transientAlphaMask))];
 
+        [self setNeedsDisplay];
         [NSCursor unhide];
-
+        
         if (self.selectionEnded) self.selectionEnded(self.transientImage);
-
+        
         return event;
     }];
 
@@ -90,27 +86,26 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
 
 - (void)dealloc {
-    CGImageRelease(_alphaMask);
     CGImageRelease(_transientAlphaMask);
-    self.alphaMask = NULL;
-    self.transientAlphaMask = NULL;
+    _transientAlphaMask = NULL;
 }
 
 #pragma mark - Properties
 
 - (void)setImage:(NSImage *)newImage {
+    if ([self.image isEqual:newImage]) return;
+    
+    [self.undoManager registerUndoWithTarget:self selector:@selector(setImage:) object:self.image];
+    
     [super setImage:newImage];
-    self.transientImage = newImage;
 }
 
-// This is a special "setter" for undoing alpha mask changes
-// We need to retain the CGImageRef alpha mask so it exists until the undo invocation occurs, this happens before registering the undo invocation
-// But we don't then want to retain it *again* (+2) as it would be in a normal setter, since it would never have a balancing release
-- (void)undoAlphaImageRef:(CGImageRef)alphaImageRef {
-    if (_alphaMask == alphaImageRef) return;
-    
-    CGImageRelease(_alphaMask);
-    _alphaMask = alphaImageRef;
+- (void)setAlphaMask:(NSImage *)alphaMask {
+    if ([_alphaMask isEqual:alphaMask]) return;
+
+    [self.undoManager registerUndoWithTarget:self selector:@selector(setAlphaMask:) object:_alphaMask];
+
+    _alphaMask = alphaMask;
 }
 
 #pragma mark - Drawing
@@ -148,10 +143,11 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGImageRef colorMaskedAlphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:colorMaskedImageRef invert:YES];
 
     // Combine it with the existing alpha mask
+    CGImageRef alphaMask = [self.alphaMask CGImageForProposedRect:&bounds context:[NSGraphicsContext currentContext] hints:nil];
     // Note that we own the CGImageRef returned from this method and it already has a retain count of +1
     // If we were to assign it directly to the property it would have a retain count of +2 (it's retained again in the synthesized setter)
     // We need to be able to release it here to prevent a leak
-    CGImageRef newAlphaMask = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:colorMaskedAlphaOnlyImageRef withAlphaOnlyCGImage:self.alphaMask];
+    CGImageRef newAlphaMask = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:colorMaskedAlphaOnlyImageRef withAlphaOnlyCGImage:alphaMask];
     self.transientAlphaMask = newAlphaMask;
     CGImageRelease(newAlphaMask);
     
@@ -277,6 +273,8 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGImageRef maskedImageRef = CGBitmapContextCreateImage(context);
     
 	NSImage *result = [[NSImage alloc] initWithCGImage:maskedImageRef size:NSMakeSize(width, height)];
+    
+    CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
     CGImageRelease(maskedImageRef);
     
