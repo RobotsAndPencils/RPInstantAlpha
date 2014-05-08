@@ -16,21 +16,21 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
 @interface RPInstantAlphaImageView ()
 
-@property (nonatomic, strong) NSImage *maskedImage;
-@property (nonatomic, assign) NSPoint startPoint;
-@property (nonatomic, assign) NSPoint currentPoint;
-@property (nonatomic, strong) NSColor *pickedColor;
-@property (nonatomic, assign) BOOL hasFinishedDragging;
-
-@property (nonatomic, copy) void (^selectionStarted)();
+@property (nonatomic, copy) void (^selectionStarted)(NSPoint mousePoint);
 @property (nonatomic, copy) void (^selectionChanged)(NSPoint mousePoint, CGFloat threshold);
 @property (nonatomic, copy) void (^selectionEnded)(NSImage *image);
 
-@property (nonatomic, strong) NSColor *minColor;
-@property (nonatomic, strong) NSColor *maxColor;
-@property (nonatomic) double threshold;
-@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef alphaImageRef;
-@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef newAlphaImageRef;
+@property (nonatomic, assign) NSPoint selectionStartPoint;
+@property (nonatomic, assign) NSPoint selectionCurrentPoint;
+@property (nonatomic, assign) BOOL hasFinishedDragging;
+@property (nonatomic, strong) NSColor *selectionStartColor;
+@property (nonatomic, strong) NSColor *selectionMinimumColor;
+@property (nonatomic, strong) NSColor *selectionMaximumColor;
+@property (nonatomic, assign) double selectionThreshold;
+
+@property (nonatomic, strong) NSImage *transientImage;
+@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef alphaMask;
+@property (nonatomic, strong) __attribute__((NSObject)) CGImageRef transientAlphaMask;
 
 @end
 
@@ -38,7 +38,9 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
 - (instancetype)initWithFrame:(NSRect)frame selectionStarted:(void (^)())selectionStarted selectionChanged:(void (^)(NSPoint mousePoint, CGFloat threshold))selectionChanged selectionEnded:(void (^)(NSImage *))selectionEnded {
     self = [super initWithFrame:frame];
-    if (!self) return nil;
+    if (!self) {
+        return nil;
+    }
 
     _selectionStarted = selectionStarted;
     _selectionChanged = selectionChanged;
@@ -51,15 +53,15 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         NSPoint mousePoint = [self convertPoint:[event locationInWindow] toView:self];
         CGFloat threshold = fmax(fmin([self distanceFromStart:mousePoint] / RPInstantAlphaThresholdMaxRadius, 1.0), 0.0);
 
-        if (NSEqualPoints(self.currentPoint, mousePoint) || self.threshold == threshold) return event;
+        if (NSEqualPoints(self.selectionCurrentPoint, mousePoint) || self.selectionThreshold == threshold) return event;
 
-        self.currentPoint = mousePoint;
-        self.threshold = threshold;
+        self.selectionCurrentPoint = mousePoint;
+        self.selectionThreshold = threshold;
 
         [self updateThresholdColors];
         [self setNeedsDisplay];
 
-        if (self.selectionChanged) self.selectionChanged(self.currentPoint, self.threshold);
+        if (self.selectionChanged) self.selectionChanged(self.selectionCurrentPoint, self.selectionThreshold);
 
         return event;
     }];
@@ -70,16 +72,16 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
         [self setNeedsDisplay];
 
         // Invocation-based undo because we're working with a CoreGraphics type
-        CGImageRetain(self.alphaImageRef);
-        [[self.undoManager prepareWithInvocationTarget:self] undoAlphaImageRef:self.alphaImageRef];
+        CGImageRetain(self.alphaMask);
+        [[self.undoManager prepareWithInvocationTarget:self] undoAlphaImageRef:self.alphaMask];
         [self.undoManager registerUndoWithTarget:self selector:@selector(setImage:) object:self.image];
 
-        self.alphaImageRef = self.newAlphaImageRef;
-        self.image = [self.maskedImage copy];
+        self.alphaMask = self.transientAlphaMask;
+        self.image = [self.transientImage copy];
 
         [NSCursor unhide];
 
-        if (self.selectionEnded) self.selectionEnded(self.maskedImage);
+        if (self.selectionEnded) self.selectionEnded(self.transientImage);
 
         return event;
     }];
@@ -88,49 +90,41 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
 
 - (void)dealloc {
-    CGImageRelease(_alphaImageRef);
-    CGImageRelease(_newAlphaImageRef);
-    self.alphaImageRef = NULL;
-    self.newAlphaImageRef = NULL;
+    CGImageRelease(_alphaMask);
+    CGImageRelease(_transientAlphaMask);
+    self.alphaMask = NULL;
+    self.transientAlphaMask = NULL;
 }
 
 #pragma mark - Properties
 
 - (void)setImage:(NSImage *)newImage {
     [super setImage:newImage];
-    self.maskedImage = newImage;
+    self.transientImage = newImage;
 }
 
 // This is a special "setter" for undoing alpha mask changes
 // We need to retain the CGImageRef alpha mask so it exists until the undo invocation occurs, this happens before registering the undo invocation
 // But we don't then want to retain it *again* (+2) as it would be in a normal setter, since it would never have a balancing release
 - (void)undoAlphaImageRef:(CGImageRef)alphaImageRef {
-    if (_alphaImageRef == alphaImageRef) return;
+    if (_alphaMask == alphaImageRef) return;
     
-    CGImageRelease(_alphaImageRef);
-    _alphaImageRef = alphaImageRef;
+    CGImageRelease(_alphaMask);
+    _alphaMask = alphaImageRef;
 }
 
 #pragma mark - Drawing
 
 - (void)drawRect:(NSRect)dirtyRect {
-    if (self.hasFinishedDragging) {
-        [self drawMaskedImage];
+    [super drawRect:dirtyRect];
+
+    if (!self.hasFinishedDragging) {
+        [self drawHighlight];
+        [self drawThresholdCircle];
     }
-    else {
-        [self drawHighlightedImage];
-    }
-    [self drawThresholdCircle];
 }
 
-- (void)drawMaskedImage {
-    NSRect actualImageRect = [self imageFrame];
-    [self.maskedImage drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
-}
-
-- (void)drawHighlightedImage {
-    if (!self.pickedColor) return;
-
+- (void)drawHighlight {
     NSRect actualImageRect = [self imageFrame];
     NSRect bounds = self.bounds;
 
@@ -138,39 +132,37 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGContextSaveGState(context);
 
     // Get the source image
-    CGImageRef imageRef = [self.image CGImageForProposedRect:&bounds context:[NSGraphicsContext currentContext] hints:nil];
+    CGImageRef startingImageRef = [self.image CGImageForProposedRect:&bounds context:[NSGraphicsContext currentContext] hints:nil];
 
     // Draw it in an alpha-less context so we can use CGImageCreateWithMaskingColors
-    CGImageRef imageRefWithoutAlpha = [self newCGImageWithoutAlphaFromCGImage:imageRef];
+    CGImageRef startingImageRefWithoutAlpha = [self newCGImageWithoutAlphaFromCGImage:startingImageRef];
 
     // Mask the original image based on the min/max colors
-    CGFloat *colorMasking = [self newColorMaskingArrayWithStartColor:self.minColor endColor:self.maxColor];
-    CGImageRef maskedImageRef = CGImageCreateWithMaskingColors(imageRefWithoutAlpha, colorMasking);
+    CGFloat *colorMaskingRange = [self newColorMaskingArrayWithStartColor:self.selectionMinimumColor endColor:self.selectionMaximumColor];
+    CGImageRef colorMaskedImageRef = CGImageCreateWithMaskingColors(startingImageRefWithoutAlpha, colorMaskingRange);
 
     // Draw the masked image in a context *with* alpha now, so that when we pass it back it will be transparent
-    CGImageRef imageRefWithAlpha = [self newCGImageWithAlphaFromCGImage:imageRefWithoutAlpha];
+    CGImageRef startingImageRefWithAlpha = [self newCGImageWithAlphaFromCGImage:startingImageRefWithoutAlpha];
 
     // Get the alpha of the newly-masked image
-    CGImageRef alphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:maskedImageRef invert:YES];
+    CGImageRef colorMaskedAlphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:colorMaskedImageRef invert:YES];
 
     // Combine it with the existing alpha mask
     // Note that we own the CGImageRef returned from this method and it already has a retain count of +1
     // If we were to assign it directly to the property it would have a retain count of +2 (it's retained again in the synthesized setter)
     // We need to be able to release it here to prevent a leak
-    CGImageRef newMask = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:alphaOnlyImageRef withAlphaOnlyCGImage:self.alphaImageRef];
-    self.newAlphaImageRef = newMask;
-    CGImageRelease(newMask);
+    CGImageRef newAlphaMask = [self newAlphaOnlyCGImageByCombiningAlphaOnlyCGImage:colorMaskedAlphaOnlyImageRef withAlphaOnlyCGImage:self.alphaMask];
+    self.transientAlphaMask = newAlphaMask;
+    CGImageRelease(newAlphaMask);
     
     // Create a masked image with the combined mask
-    CGImageRef mask = [self newCGImageMaskWithCGImage:newMask];
-    self.maskedImage = [self maskedCGImage:imageRefWithAlpha withCGImageMask:mask];
+    CGImageRef mask = [self newCGImageMaskWithCGImage:newAlphaMask];
+    self.transientImage = [self maskedCGImage:startingImageRefWithAlpha withCGImageMask:mask];
 
     // Actual drawing now
-    // Draw the original image first
-    [self.image drawInRect:actualImageRect fromRect:NSMakeRect(0.0, 0.0, self.image.size.width, self.image.size.height) operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
-
+    // We should have already drawn the original image before this method was called
     // Draw the translucent highlight overlay
-    CGImageRef invertedMask = [self newAlphaOnlyCGImageWithCGImage:alphaOnlyImageRef invert:NO];
+    CGImageRef invertedMask = [self newAlphaOnlyCGImageWithCGImage:colorMaskedAlphaOnlyImageRef invert:NO];
     CGContextClipToMask(context, bounds, invertedMask);
     CGContextSetRGBFillColor(context, 0.0, 1.0, 0.0, 0.5);
     CGContextFillRect(context, actualImageRect);
@@ -178,20 +170,18 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     // Cleanup
     CGContextRestoreGState(context);
 
-    CGImageRelease(imageRefWithoutAlpha);
-    CGImageRelease(imageRefWithAlpha);
-    CGImageRelease(alphaOnlyImageRef);
-    CGImageRelease(maskedImageRef);
+    CGImageRelease(startingImageRefWithoutAlpha);
+    CGImageRelease(startingImageRefWithAlpha);
+    CGImageRelease(colorMaskedImageRef);
+    CGImageRelease(colorMaskedAlphaOnlyImageRef);
     CGImageRelease(mask);
     CGImageRelease(invertedMask);
-    free(colorMasking);
+    free(colorMaskingRange);
 }
 
 - (void)drawThresholdCircle {
-    if (self.hasFinishedDragging) return;
-
-    CGFloat radius = [self distanceFromStart:self.currentPoint];
-    NSRect thresholdRect = NSMakeRect(self.startPoint.x - radius, self.startPoint.y - radius, radius * 2.0, radius * 2.0);
+    CGFloat radius = [self distanceFromStart:self.selectionCurrentPoint];
+    NSRect thresholdRect = NSMakeRect(self.selectionStartPoint.x - radius, self.selectionStartPoint.y - radius, radius * 2.0, radius * 2.0);
     NSBezierPath *thresholdCircle = [NSBezierPath bezierPathWithOvalInRect:thresholdRect];
 
     [[NSColor colorWithWhite:1.0 alpha:0.5] set];
@@ -207,23 +197,23 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     self.hasFinishedDragging = NO;
 
-    self.startPoint = mousePoint;
-    self.currentPoint = mousePoint;
-    self.threshold = 0.0;
+    self.selectionStartPoint = mousePoint;
+    self.selectionCurrentPoint = mousePoint;
+    self.selectionThreshold = 0.0;
 
     // In order to get the color at the mouse coordinate, we need to scale the mouse point to the point in the original image rect
     NSRect imageRect = [self imageFrame];
     CGFloat imageXScale = imageRect.size.width / self.image.size.width;
     CGFloat imageYScale = imageRect.size.height / self.image.size.height;
     mousePoint = NSMakePoint((mousePoint.x - imageRect.origin.x) / imageXScale, (mousePoint.y - imageRect.origin.y) / imageYScale);
-    self.pickedColor = [self sampleColorAtPoint:mousePoint];
+    self.selectionStartColor = [self sampleColorAtPoint:mousePoint];
 
     [self updateThresholdColors];
     [self setNeedsDisplay];
 
     [NSCursor hide];
 
-    if (self.selectionStarted) self.selectionStarted();
+    if (self.selectionStarted) self.selectionStarted(mousePoint);
 }
 
 #pragma mark - Helpers
@@ -232,10 +222,10 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 // 100% threshold should cover 0.0f - 255.0f for all components
 - (void)updateThresholdColors {
     CGFloat red, green, blue;
-    [self.pickedColor getRed:&red green:&green blue:&blue alpha:NULL];
+    [self.selectionStartColor getRed:&red green:&green blue:&blue alpha:NULL];
 
-    self.minColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:0.0];
-    self.maxColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:1.0];
+    self.selectionMinimumColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:0.0];
+    self.selectionMaximumColor = [self colorWithComponentsBetweenRed:red green:green blue:blue bound:1.0];
 }
 
 - (NSColor *)sampleColorAtPoint:(NSPoint)point {
@@ -247,7 +237,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
                                
 - (CGFloat)distanceFromStart:(NSPoint)point {
-   CGFloat distance = sqrt(pow(point.x - self.startPoint.x, 2.0) + pow(point.y - self.startPoint.y, 2.0));
+   CGFloat distance = sqrt(pow(point.x - self.selectionStartPoint.x, 2.0) + pow(point.y - self.selectionStartPoint.y, 2.0));
     return distance;
 }
 
@@ -349,9 +339,9 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     CGFloat adjustedRed, adjustedGreen, adjustedBlue;
 
-    adjustedRed = map(0.0, 1.0, red, bound, self.threshold);
-    adjustedGreen = map(0.0, 1.0, green, bound, self.threshold);
-    adjustedBlue = map(0.0, 1.0, blue, bound, self.threshold);
+    adjustedRed = map(0.0, 1.0, red, bound, self.selectionThreshold);
+    adjustedGreen = map(0.0, 1.0, green, bound, self.selectionThreshold);
+    adjustedBlue = map(0.0, 1.0, blue, bound, self.selectionThreshold);
 
     NSColor *adjustedColor = [NSColor colorWithDeviceRed:adjustedRed green:adjustedGreen blue:adjustedBlue alpha:1.0];
     return adjustedColor;

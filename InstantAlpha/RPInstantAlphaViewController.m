@@ -76,14 +76,13 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     self.labelView = [[RPThresholdLabelView alloc] initWithFrame:NSInsetRect(labelRect, 1.0, 1.0) cornerRadius:RPInstantAlphaThresholdLabelCornerRadius];
     [self.thresholdLabelWindow setContentView:self.labelView];
 
-    self.imageView = [[RPInstantAlphaImageView alloc] initWithFrame:self.view.bounds selectionStarted:^{
-        [self.thresholdLabelWindow makeKeyAndOrderFront:nil];
+    self.imageView = [[RPInstantAlphaImageView alloc] initWithFrame:self.view.bounds selectionStarted:^(NSPoint mousePoint){
+        weakSelf.labelView.threshold = 0.0;
+        [weakSelf.thresholdLabelWindow makeKeyAndOrderFront:nil];
+        [weakSelf moveThresholdWindowToMousePoint:mousePoint];
     } selectionChanged:^(NSPoint mousePoint, CGFloat threshold) {
-        NSPoint windowOrigin = weakSelf.view.window.frame.origin;
-        NSPoint mouseRelativeToViewPoint = NSMakePoint(mousePoint.x + windowOrigin.x, mousePoint.y + windowOrigin.y);
-        mouseRelativeToViewPoint.y -= RPInstantAlphaThresholdLabelHeight; // Align top-left corner to mouse instead of bottom-left (origin)
-        [weakSelf.thresholdLabelWindow setFrameOrigin:mouseRelativeToViewPoint];
         weakSelf.labelView.threshold = threshold;
+        [weakSelf moveThresholdWindowToMousePoint:mousePoint];
     } selectionEnded:^(NSImage *image) {
         [weakSelf.thresholdLabelWindow close];
         weakSelf.editedImage = image;
@@ -92,6 +91,15 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     self.imageView.image = _editedImage;
     self.imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.view addSubview:self.imageView];
+}
+
+#pragma mark - Private
+
+- (void)moveThresholdWindowToMousePoint:(NSPoint)mousePoint {
+    NSPoint windowOrigin = self.view.window.frame.origin;
+    NSPoint mouseRelativeToViewPoint = NSMakePoint(mousePoint.x + windowOrigin.x, mousePoint.y + windowOrigin.y);
+    mouseRelativeToViewPoint.y -= RPInstantAlphaThresholdLabelHeight; // Align top-left corner to mouse instead of bottom-left (origin)
+    [self.thresholdLabelWindow setFrameOrigin:mouseRelativeToViewPoint];
 }
 
 - (void)reset {
