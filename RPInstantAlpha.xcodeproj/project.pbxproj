@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		CA7A1C0A1922C35B004AC3CF /* RPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB6A7F519149E0600576A36 /* RPAppDelegate.m */; };
 		CA7A1C131922C4E2004AC3CF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C111922C4E2004AC3CF /* MainMenu.xib */; };
-		CA7A1C1C1922C509004AC3CF /* RPInstantAlpha-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C191922C509004AC3CF /* RPInstantAlpha-Info.plist */; };
 		CA7A1C211922C514004AC3CF /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C1D1922C514004AC3CF /* Credits.rtf */; };
 		CA7A1C221922C514004AC3CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C1F1922C514004AC3CF /* InfoPlist.strings */; };
 		CA7A1C251922C52B004AC3CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C241922C52B004AC3CF /* main.m */; };
@@ -271,7 +270,6 @@
 				CA7A1C221922C514004AC3CF /* InfoPlist.strings in Resources */,
 				CA7A1C131922C4E2004AC3CF /* MainMenu.xib in Resources */,
 				CAB6A7FB19149E0600576A36 /* Images.xcassets in Resources */,
-				CA7A1C1C1922C509004AC3CF /* RPInstantAlpha-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
