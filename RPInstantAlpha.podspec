@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version          = "0.1.0"
   s.summary          = "Easily allow users to remove the background from an image"
   s.homepage         = "https://github.com/RobotsAndPencils/RPInstantAlpha"
-  s.screenshots      = "www.example.com/screenshots_1"
+  s.screenshots      = "http://f.cl.ly/items/3t1Q32101W1j1p251J0Z/demo.gif"
   s.license          = 'MIT'
   s.author           = { "Brandon Evans" => "brandon.evans@robotsandpencils.com" }
   s.source           = { :git => "http://github.com/RobotsAndPencils/RPInstantAlpha.git", :tag => s.version.to_s }
