@@ -1,6 +1,6 @@
 //
-//  InstantAlphaTests.m
-//  InstantAlphaTests
+//  RPInstantAlphaTests.m
+//  RPInstantAlphaTests
 //
 //  Created by Brandon Evans on 2014-05-02.
 //  Copyright (c) 2014 Robots and Pencils. All rights reserved.
@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface InstantAlphaTests : XCTestCase
+@interface RPInstantAlphaTests : XCTestCase
 
 @end
 
-@implementation InstantAlphaTests
+@implementation RPInstantAlphaTests
 
 - (void)setUp
 {

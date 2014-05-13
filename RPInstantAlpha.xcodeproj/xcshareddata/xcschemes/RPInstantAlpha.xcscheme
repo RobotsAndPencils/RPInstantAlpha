@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CAB6A7DE19149E0600576A36"
-               BuildableName = "InstantAlpha.app"
-               BlueprintName = "InstantAlpha"
-               ReferencedContainer = "container:InstantAlpha.xcodeproj">
+               BuildableName = "RPInstantAlpha.app"
+               BlueprintName = "RPInstantAlpha"
+               ReferencedContainer = "container:RPInstantAlpha.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "CAB6A7FF19149E0600576A36"
-               BuildableName = "InstantAlphaTests.xctest"
-               BlueprintName = "InstantAlphaTests"
-               ReferencedContainer = "container:InstantAlpha.xcodeproj">
+               BuildableName = "RPInstantAlphaTests.xctest"
+               BlueprintName = "RPInstantAlphaTests"
+               ReferencedContainer = "container:RPInstantAlpha.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CAB6A7DE19149E0600576A36"
-            BuildableName = "InstantAlpha.app"
-            BlueprintName = "InstantAlpha"
-            ReferencedContainer = "container:InstantAlpha.xcodeproj">
+            BuildableName = "RPInstantAlpha.app"
+            BlueprintName = "RPInstantAlpha"
+            ReferencedContainer = "container:RPInstantAlpha.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CAB6A7DE19149E0600576A36"
-            BuildableName = "InstantAlpha.app"
-            BlueprintName = "InstantAlpha"
-            ReferencedContainer = "container:InstantAlpha.xcodeproj">
+            BuildableName = "RPInstantAlpha.app"
+            BlueprintName = "RPInstantAlpha"
+            ReferencedContainer = "container:RPInstantAlpha.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -80,9 +80,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "CAB6A7DE19149E0600576A36"
-            BuildableName = "InstantAlpha.app"
-            BlueprintName = "InstantAlpha"
-            ReferencedContainer = "container:InstantAlpha.xcodeproj">
+            BuildableName = "RPInstantAlpha.app"
+            BlueprintName = "RPInstantAlpha"
+            ReferencedContainer = "container:RPInstantAlpha.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

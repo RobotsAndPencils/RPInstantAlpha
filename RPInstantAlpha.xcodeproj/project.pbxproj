@@ -1,0 +1,528 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CA7A1C0A1922C35B004AC3CF /* RPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB6A7F519149E0600576A36 /* RPAppDelegate.m */; };
+		CA7A1C131922C4E2004AC3CF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C111922C4E2004AC3CF /* MainMenu.xib */; };
+		CA7A1C1C1922C509004AC3CF /* RPInstantAlpha-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C191922C509004AC3CF /* RPInstantAlpha-Info.plist */; };
+		CA7A1C211922C514004AC3CF /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C1D1922C514004AC3CF /* Credits.rtf */; };
+		CA7A1C221922C514004AC3CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C1F1922C514004AC3CF /* InfoPlist.strings */; };
+		CA7A1C251922C52B004AC3CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C241922C52B004AC3CF /* main.m */; };
+		CA7A1C331922C53F004AC3CF /* RPInstantAlphaImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C271922C53F004AC3CF /* RPInstantAlphaImageView.m */; };
+		CA7A1C341922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C291922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.m */; };
+		CA7A1C351922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C2A1922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.xib */; };
+		CA7A1C361922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C2C1922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.m */; };
+		CA7A1C371922C53F004AC3CF /* RPInstantAlphaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C2E1922C53F004AC3CF /* RPInstantAlphaViewController.m */; };
+		CA7A1C381922C53F004AC3CF /* RPThresholdLabelView.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C301922C53F004AC3CF /* RPThresholdLabelView.m */; };
+		CA7A1C391922C53F004AC3CF /* RPThresholdLabelWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C321922C53F004AC3CF /* RPThresholdLabelWindow.m */; };
+		CA7A1C3B1922C54A004AC3CF /* RPInstantAlphaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CA7A1C3A1922C54A004AC3CF /* RPInstantAlphaTests.m */; };
+		CA7A1C3D1922C573004AC3CF /* RPInstantAlphaTests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C3C1922C573004AC3CF /* RPInstantAlphaTests-Info.plist */; };
+		CA7A1C401922C577004AC3CF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CA7A1C3E1922C577004AC3CF /* InfoPlist.strings */; };
+		CAB6A7E319149E0600576A36 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAB6A7E219149E0600576A36 /* Cocoa.framework */; };
+		CAB6A7FB19149E0600576A36 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAB6A7FA19149E0600576A36 /* Images.xcassets */; };
+		CAB6A80219149E0600576A36 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAB6A80119149E0600576A36 /* XCTest.framework */; };
+		CAB6A80319149E0600576A36 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAB6A7E219149E0600576A36 /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CAB6A80419149E0600576A36 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CAB6A7D719149E0600576A36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAB6A7DE19149E0600576A36;
+			remoteInfo = RPInstantAlpha;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CA7A1C121922C4E2004AC3CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		CA7A1C191922C509004AC3CF /* RPInstantAlpha-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RPInstantAlpha-Info.plist"; sourceTree = "<group>"; };
+		CA7A1C1E1922C514004AC3CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		CA7A1C201922C514004AC3CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CA7A1C231922C524004AC3CF /* RPInstantAlpha-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RPInstantAlpha-Prefix.pch"; sourceTree = "<group>"; };
+		CA7A1C241922C52B004AC3CF /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CA7A1C261922C53F004AC3CF /* RPInstantAlphaImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPInstantAlphaImageView.h; sourceTree = "<group>"; };
+		CA7A1C271922C53F004AC3CF /* RPInstantAlphaImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaImageView.m; sourceTree = "<group>"; };
+		CA7A1C281922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPInstantAlphaInstructionsWindow.h; sourceTree = "<group>"; };
+		CA7A1C291922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaInstructionsWindow.m; sourceTree = "<group>"; };
+		CA7A1C2A1922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RPInstantAlphaInstructionsWindow.xib; sourceTree = "<group>"; };
+		CA7A1C2B1922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPInstantAlphaInstructionsWindowController.h; sourceTree = "<group>"; };
+		CA7A1C2C1922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaInstructionsWindowController.m; sourceTree = "<group>"; };
+		CA7A1C2D1922C53F004AC3CF /* RPInstantAlphaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPInstantAlphaViewController.h; sourceTree = "<group>"; };
+		CA7A1C2E1922C53F004AC3CF /* RPInstantAlphaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaViewController.m; sourceTree = "<group>"; };
+		CA7A1C2F1922C53F004AC3CF /* RPThresholdLabelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPThresholdLabelView.h; sourceTree = "<group>"; };
+		CA7A1C301922C53F004AC3CF /* RPThresholdLabelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPThresholdLabelView.m; sourceTree = "<group>"; };
+		CA7A1C311922C53F004AC3CF /* RPThresholdLabelWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPThresholdLabelWindow.h; sourceTree = "<group>"; };
+		CA7A1C321922C53F004AC3CF /* RPThresholdLabelWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPThresholdLabelWindow.m; sourceTree = "<group>"; };
+		CA7A1C3A1922C54A004AC3CF /* RPInstantAlphaTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RPInstantAlphaTests.m; sourceTree = "<group>"; };
+		CA7A1C3C1922C573004AC3CF /* RPInstantAlphaTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RPInstantAlphaTests-Info.plist"; sourceTree = "<group>"; };
+		CA7A1C3F1922C577004AC3CF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CAB6A7DF19149E0600576A36 /* RPInstantAlpha.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RPInstantAlpha.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAB6A7E219149E0600576A36 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		CAB6A7E519149E0600576A36 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		CAB6A7E619149E0600576A36 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		CAB6A7E719149E0600576A36 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		CAB6A7F419149E0600576A36 /* RPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RPAppDelegate.h; sourceTree = "<group>"; };
+		CAB6A7F519149E0600576A36 /* RPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RPAppDelegate.m; sourceTree = "<group>"; };
+		CAB6A7FA19149E0600576A36 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		CAB6A80019149E0600576A36 /* RPInstantAlphaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RPInstantAlphaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAB6A80119149E0600576A36 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CAB6A7DC19149E0600576A36 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAB6A7E319149E0600576A36 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAB6A7FD19149E0600576A36 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAB6A80319149E0600576A36 /* Cocoa.framework in Frameworks */,
+				CAB6A80219149E0600576A36 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CAB6A7D619149E0600576A36 = {
+			isa = PBXGroup;
+			children = (
+				CAB6A7E819149E0600576A36 /* RPInstantAlpha */,
+				CAB6A80619149E0600576A36 /* RPInstantAlphaTests */,
+				CAB6A7E119149E0600576A36 /* Frameworks */,
+				CAB6A7E019149E0600576A36 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CAB6A7E019149E0600576A36 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CAB6A7DF19149E0600576A36 /* RPInstantAlpha.app */,
+				CAB6A80019149E0600576A36 /* RPInstantAlphaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CAB6A7E119149E0600576A36 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CAB6A7E219149E0600576A36 /* Cocoa.framework */,
+				CAB6A80119149E0600576A36 /* XCTest.framework */,
+				CAB6A7E419149E0600576A36 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CAB6A7E419149E0600576A36 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CAB6A7E519149E0600576A36 /* AppKit.framework */,
+				CAB6A7E619149E0600576A36 /* CoreData.framework */,
+				CAB6A7E719149E0600576A36 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		CAB6A7E819149E0600576A36 /* RPInstantAlpha */ = {
+			isa = PBXGroup;
+			children = (
+				CAB6A7F419149E0600576A36 /* RPAppDelegate.h */,
+				CAB6A7F519149E0600576A36 /* RPAppDelegate.m */,
+				CA7A1C111922C4E2004AC3CF /* MainMenu.xib */,
+				CAB6A7FA19149E0600576A36 /* Images.xcassets */,
+				CAB6A7E919149E0600576A36 /* Supporting Files */,
+				CA7A1C261922C53F004AC3CF /* RPInstantAlphaImageView.h */,
+				CA7A1C271922C53F004AC3CF /* RPInstantAlphaImageView.m */,
+				CA7A1C281922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.h */,
+				CA7A1C291922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.m */,
+				CA7A1C2A1922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.xib */,
+				CA7A1C2B1922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.h */,
+				CA7A1C2C1922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.m */,
+				CA7A1C2D1922C53F004AC3CF /* RPInstantAlphaViewController.h */,
+				CA7A1C2E1922C53F004AC3CF /* RPInstantAlphaViewController.m */,
+				CA7A1C2F1922C53F004AC3CF /* RPThresholdLabelView.h */,
+				CA7A1C301922C53F004AC3CF /* RPThresholdLabelView.m */,
+				CA7A1C311922C53F004AC3CF /* RPThresholdLabelWindow.h */,
+				CA7A1C321922C53F004AC3CF /* RPThresholdLabelWindow.m */,
+			);
+			path = RPInstantAlpha;
+			sourceTree = "<group>";
+		};
+		CAB6A7E919149E0600576A36 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CA7A1C1D1922C514004AC3CF /* Credits.rtf */,
+				CA7A1C231922C524004AC3CF /* RPInstantAlpha-Prefix.pch */,
+				CA7A1C1F1922C514004AC3CF /* InfoPlist.strings */,
+				CA7A1C241922C52B004AC3CF /* main.m */,
+				CA7A1C191922C509004AC3CF /* RPInstantAlpha-Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CAB6A80619149E0600576A36 /* RPInstantAlphaTests */ = {
+			isa = PBXGroup;
+			children = (
+				CA7A1C3A1922C54A004AC3CF /* RPInstantAlphaTests.m */,
+				CAB6A80719149E0600576A36 /* Supporting Files */,
+			);
+			path = RPInstantAlphaTests;
+			sourceTree = "<group>";
+		};
+		CAB6A80719149E0600576A36 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CA7A1C3C1922C573004AC3CF /* RPInstantAlphaTests-Info.plist */,
+				CA7A1C3E1922C577004AC3CF /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CAB6A7DE19149E0600576A36 /* RPInstantAlpha */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAB6A81019149E0600576A36 /* Build configuration list for PBXNativeTarget "RPInstantAlpha" */;
+			buildPhases = (
+				CAB6A7DB19149E0600576A36 /* Sources */,
+				CAB6A7DC19149E0600576A36 /* Frameworks */,
+				CAB6A7DD19149E0600576A36 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RPInstantAlpha;
+			productName = RPInstantAlpha;
+			productReference = CAB6A7DF19149E0600576A36 /* RPInstantAlpha.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CAB6A7FF19149E0600576A36 /* RPInstantAlphaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAB6A81319149E0600576A36 /* Build configuration list for PBXNativeTarget "RPInstantAlphaTests" */;
+			buildPhases = (
+				CAB6A7FC19149E0600576A36 /* Sources */,
+				CAB6A7FD19149E0600576A36 /* Frameworks */,
+				CAB6A7FE19149E0600576A36 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAB6A80519149E0600576A36 /* PBXTargetDependency */,
+			);
+			name = RPInstantAlphaTests;
+			productName = RPInstantAlphaTests;
+			productReference = CAB6A80019149E0600576A36 /* RPInstantAlphaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CAB6A7D719149E0600576A36 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = RP;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Robots and Pencils";
+				TargetAttributes = {
+					CAB6A7FF19149E0600576A36 = {
+						TestTargetID = CAB6A7DE19149E0600576A36;
+					};
+				};
+			};
+			buildConfigurationList = CAB6A7DA19149E0600576A36 /* Build configuration list for PBXProject "RPInstantAlpha" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CAB6A7D619149E0600576A36;
+			productRefGroup = CAB6A7E019149E0600576A36 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CAB6A7DE19149E0600576A36 /* RPInstantAlpha */,
+				CAB6A7FF19149E0600576A36 /* RPInstantAlphaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CAB6A7DD19149E0600576A36 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7A1C211922C514004AC3CF /* Credits.rtf in Resources */,
+				CA7A1C351922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.xib in Resources */,
+				CA7A1C221922C514004AC3CF /* InfoPlist.strings in Resources */,
+				CA7A1C131922C4E2004AC3CF /* MainMenu.xib in Resources */,
+				CAB6A7FB19149E0600576A36 /* Images.xcassets in Resources */,
+				CA7A1C1C1922C509004AC3CF /* RPInstantAlpha-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAB6A7FE19149E0600576A36 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7A1C3D1922C573004AC3CF /* RPInstantAlphaTests-Info.plist in Resources */,
+				CA7A1C401922C577004AC3CF /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CAB6A7DB19149E0600576A36 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7A1C381922C53F004AC3CF /* RPThresholdLabelView.m in Sources */,
+				CA7A1C0A1922C35B004AC3CF /* RPAppDelegate.m in Sources */,
+				CA7A1C391922C53F004AC3CF /* RPThresholdLabelWindow.m in Sources */,
+				CA7A1C371922C53F004AC3CF /* RPInstantAlphaViewController.m in Sources */,
+				CA7A1C361922C53F004AC3CF /* RPInstantAlphaInstructionsWindowController.m in Sources */,
+				CA7A1C331922C53F004AC3CF /* RPInstantAlphaImageView.m in Sources */,
+				CA7A1C251922C52B004AC3CF /* main.m in Sources */,
+				CA7A1C341922C53F004AC3CF /* RPInstantAlphaInstructionsWindow.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAB6A7FC19149E0600576A36 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7A1C3B1922C54A004AC3CF /* RPInstantAlphaTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CAB6A80519149E0600576A36 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAB6A7DE19149E0600576A36 /* RPInstantAlpha */;
+			targetProxy = CAB6A80419149E0600576A36 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		CA7A1C111922C4E2004AC3CF /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA7A1C121922C4E2004AC3CF /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		CA7A1C1D1922C514004AC3CF /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA7A1C1E1922C514004AC3CF /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		CA7A1C1F1922C514004AC3CF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA7A1C201922C514004AC3CF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		CA7A1C3E1922C577004AC3CF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA7A1C3F1922C577004AC3CF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CAB6A80E19149E0600576A36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CAB6A80F19149E0600576A36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CAB6A81119149E0600576A36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RPInstantAlpha/RPInstantAlpha-Prefix.pch";
+				INFOPLIST_FILE = "RPInstantAlpha/RPInstantAlpha-Info.plist";
+				PRODUCT_NAME = RPInstantAlpha;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		CAB6A81219149E0600576A36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RPInstantAlpha/RPInstantAlpha-Prefix.pch";
+				INFOPLIST_FILE = "RPInstantAlpha/RPInstantAlpha-Info.plist";
+				PRODUCT_NAME = RPInstantAlpha;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		CAB6A81419149E0600576A36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RPInstantAlpha.app/Contents/MacOS/RPInstantAlpha";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RPInstantAlpha/RPInstantAlpha-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "RPInstantAlphaTests/RPInstantAlphaTests-Info.plist";
+				PRODUCT_NAME = RPInstantAlphaTests;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		CAB6A81519149E0600576A36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RPInstantAlpha.app/Contents/MacOS/RPInstantAlpha";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RPInstantAlpha/RPInstantAlpha-Prefix.pch";
+				INFOPLIST_FILE = "RPInstantAlphaTests/RPInstantAlphaTests-Info.plist";
+				PRODUCT_NAME = RPInstantAlphaTests;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CAB6A7DA19149E0600576A36 /* Build configuration list for PBXProject "RPInstantAlpha" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAB6A80E19149E0600576A36 /* Debug */,
+				CAB6A80F19149E0600576A36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAB6A81019149E0600576A36 /* Build configuration list for PBXNativeTarget "RPInstantAlpha" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAB6A81119149E0600576A36 /* Debug */,
+				CAB6A81219149E0600576A36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAB6A81319149E0600576A36 /* Build configuration list for PBXNativeTarget "RPInstantAlphaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAB6A81419149E0600576A36 /* Debug */,
+				CAB6A81519149E0600576A36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CAB6A7D719149E0600576A36 /* Project object */;
+}
