@@ -159,7 +159,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     // We should have already drawn the original image before this method was called
     // Draw the translucent highlight overlay
     CGImageRef invertedMask = [self newAlphaOnlyCGImageWithCGImage:colorMaskedAlphaOnlyImageRef invert:NO];
-    CGContextClipToMask(context, bounds, invertedMask);
+    CGContextClipToMask(context, actualImageRect, invertedMask);
     CGContextSetRGBFillColor(context, 0.0, 1.0, 0.0, 0.5);
     CGContextFillRect(context, actualImageRect);
 
