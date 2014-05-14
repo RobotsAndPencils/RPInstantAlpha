@@ -136,9 +136,6 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGFloat *colorMaskingRange = [self newColorMaskingArrayWithStartColor:self.selectionMinimumColor endColor:self.selectionMaximumColor];
     CGImageRef colorMaskedImageRef = CGImageCreateWithMaskingColors(startingImageRefWithoutAlpha, colorMaskingRange);
 
-    // Draw the masked image in a context *with* alpha now, so that when we pass it back it will be transparent
-    CGImageRef startingImageRefWithAlpha = [self newCGImageWithAlphaFromCGImage:startingImageRefWithoutAlpha];
-
     // Get the alpha of the newly-masked image
     CGImageRef colorMaskedAlphaOnlyImageRef = [self newAlphaOnlyCGImageWithCGImage:colorMaskedImageRef invert:YES];
 
@@ -153,7 +150,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     
     // Create a masked image with the combined mask
     CGImageRef mask = [self newCGImageMaskWithCGImage:newAlphaMask];
-    self.transientImage = [self maskedCGImage:startingImageRefWithAlpha withCGImageMask:mask];
+    self.transientImage = [self maskedCGImage:startingImageRef withCGImageMask:mask];
 
     // Actual drawing now
     // We should have already drawn the original image before this method was called
@@ -167,7 +164,6 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     CGContextRestoreGState(context);
 
     CGImageRelease(startingImageRefWithoutAlpha);
-    CGImageRelease(startingImageRefWithAlpha);
     CGImageRelease(colorMaskedImageRef);
     CGImageRelease(colorMaskedAlphaOnlyImageRef);
     CGImageRelease(mask);
