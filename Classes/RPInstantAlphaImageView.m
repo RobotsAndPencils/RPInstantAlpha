@@ -7,6 +7,7 @@
 //
 
 #import "RPInstantAlphaImageView.h"
+#import "tgmath.h"
 
 const CGFloat RPInstantAlphaThresholdMaxRadius = 200.0;
 
@@ -233,28 +234,75 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     return distance;
 }
 
-- (CGFloat)imageScale {
-    NSSize size = [[self image] size];
-    NSRect iFrame = [self bounds];
-    if (NSWidth(iFrame) > size.width && NSHeight(iFrame) > size.height) {
-        return 1.0;
-    }
-    else {
-        CGFloat xRatio = NSWidth(iFrame)/size.width;
-        CGFloat yRatio = NSHeight(iFrame)/size.height;
-        return fmin(xRatio, yRatio);
-    }
-}
-
 - (NSRect)imageFrame {
     NSSize size = [[self image] size];
     NSRect bounds = [self bounds];
-    CGFloat scale = [self imageScale];
-    NSRect imageRect;
-    imageRect.size.width = floor(size.width * scale + 0.5);
-    imageRect.size.height = floor(size.height * scale + 0.5);
-    imageRect.origin.x = floor((bounds.size.width - imageRect.size.width) / 2.0 + 0.5);
-    imageRect.origin.y = floor((bounds.size.height - imageRect.size.height) / 2.0 + 0.5);
+    CGFloat xScale = NSWidth(bounds) / size.width;
+    CGFloat yScale = NSHeight(bounds) / size.height;
+    
+    switch (self.imageScaling) {
+        case NSImageScaleNone:
+            xScale = 1.0;
+            yScale = 1.0;
+            break;
+        case NSImageScaleProportionallyDown:
+            xScale = fmin(xScale, 1.0);
+            yScale = fmin(yScale, 1.0);
+            break;
+        case NSImageScaleProportionallyUpOrDown:
+            xScale = fmin(xScale, yScale);
+            yScale = xScale;
+            break;
+        case NSImageScaleAxesIndependently:
+        default:
+            break;
+    }
+    
+    CGFloat width = size.width * xScale;
+    CGFloat height = size.height * yScale;
+    CGFloat xDifference = bounds.size.width - width;
+    CGFloat yDifference = bounds.size.height - height;
+    
+    CGFloat x = xDifference / 2.0;
+    CGFloat y = yDifference / 2.0;
+    
+    switch (self.imageAlignment) {
+        case NSImageAlignBottom:
+            y = 0.0;
+            break;
+        case NSImageAlignBottomLeft:
+            y = 0.0;
+            x = 0.0;
+            break;
+        case NSImageAlignBottomRight:
+            y = 0.0;
+            x = xDifference;
+            break;
+        case NSImageAlignCenter:
+            break;
+        case NSImageAlignLeft:
+            x = 0.0;
+            break;
+        case NSImageAlignRight:
+            x = xDifference;
+            break;
+        case NSImageAlignTop:
+            y = yDifference;
+            break;
+        case NSImageAlignTopLeft:
+            y = yDifference;
+            x = 0.0;
+            break;
+        case NSImageAlignTopRight:
+            y = yDifference;
+            x = xDifference;
+            break;
+        default:
+            break;
+    }
+    
+    NSRect imageRect = NSIntegralRect(NSMakeRect(x, y, width, height));
+    
     return imageRect;
 }
 
