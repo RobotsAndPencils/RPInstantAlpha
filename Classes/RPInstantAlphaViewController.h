@@ -7,6 +7,7 @@
 //
 
 @class RPThresholdLabelView;
+@class RPInstantAlphaImageView;
 
 @interface RPInstantAlphaViewController : NSViewController
 

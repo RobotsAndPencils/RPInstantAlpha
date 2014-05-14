@@ -20,7 +20,6 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 
 @interface RPInstantAlphaViewController ()
 
-@property (nonatomic, strong) RPInstantAlphaImageView *imageView;
 @property (nonatomic, strong) RPInstantAlphaInstructionsWindowController *instructionsWindowController;
 @property (nonatomic, strong) NSWindow *thresholdLabelWindow;
 
@@ -62,9 +61,6 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 }
 
 - (void)loadView {
-    self.view = [[NSView alloc] init];
-    self.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-    
     __weak __typeof(self) weakSelf = self;
     self.instructionsWindowController = [[RPInstantAlphaInstructionsWindowController alloc] initWithReset:^{
         [weakSelf reset];
@@ -77,8 +73,8 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     
     self.labelView = [[RPThresholdLabelView alloc] initWithFrame:NSInsetRect(labelRect, 1.0, 1.0) cornerRadius:RPInstantAlphaThresholdLabelCornerRadius];
     [self.thresholdLabelWindow setContentView:self.labelView];
-
-    self.imageView = [[RPInstantAlphaImageView alloc] initWithFrame:self.view.bounds selectionStarted:^(NSPoint mousePoint){
+    
+    RPInstantAlphaImageView *imageView = [[RPInstantAlphaImageView alloc] initWithFrame:NSZeroRect selectionStarted:^(NSPoint mousePoint){
         weakSelf.labelView.threshold = 0.0;
         [weakSelf.thresholdLabelWindow makeKeyAndOrderFront:nil];
         [weakSelf moveThresholdWindowToMousePoint:mousePoint];
@@ -89,9 +85,10 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
         [weakSelf.thresholdLabelWindow close];
     }];
     
-    self.imageView.image = [self.originalImage copy];
-    self.imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-    [self.view addSubview:self.imageView];
+    imageView.image = [self.originalImage copy];
+    imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    
+    self.view = imageView;
 }
 
 #pragma mark - Private
@@ -104,11 +101,14 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 }
 
 - (void)reset {
-    self.imageView.image = [self.originalImage copy];
+    RPInstantAlphaImageView *imageView = (RPInstantAlphaImageView *)self.view;
+    imageView.image = [self.originalImage copy];
 }
 
 - (void)done {
-    if (self.completion) self.completion(self.imageView.image);
+    RPInstantAlphaImageView *imageView = (RPInstantAlphaImageView *)self.view;
+    NSImage *image = imageView.image;
+    if (self.completion) self.completion(image);
 }
 
 @end
