@@ -11,6 +11,7 @@
 @interface RPInstantAlphaViewController : NSViewController
 
 - (instancetype)initWithImage:(NSImage *)image completion:(void(^)(NSImage *))completion;
-- (void)displayHUD; // Must be called after this controller's view is added to a view hierarchy
+- (void)showHUD; // Must be called after this controller's view is added to a view hierarchy
+- (void)dismissHUD;
 
 @end

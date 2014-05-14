@@ -29,7 +29,7 @@
     self.instantAlphaViewController.view.frame = imageRect;
     self.instantAlphaViewController.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.contentView addSubview:self.instantAlphaViewController.view];
-    [self.instantAlphaViewController displayHUD];
+    [self.instantAlphaViewController showHUD];
 }
 
 @end

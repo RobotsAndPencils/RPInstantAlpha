@@ -44,7 +44,7 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     return self;
 }
 
-- (void)displayHUD {
+- (void)showHUD {
     [self.instructionsWindowController.window orderFront:nil];
     NSRect instructionsFrame = ({
         CGRect instructionsFrame = self.instructionsWindowController.window.frame;
@@ -55,6 +55,10 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
         instructionsFrame;
     });
     [self.instructionsWindowController.window setFrame:instructionsFrame display:YES];
+}
+
+- (void)dismissHUD {
+    [self.instructionsWindowController.window close];
 }
 
 - (void)loadView {
