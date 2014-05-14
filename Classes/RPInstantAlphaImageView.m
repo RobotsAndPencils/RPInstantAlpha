@@ -52,7 +52,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 
     // Setup mouse handlers with a local monitor so they are fired even if the mouse is outside this view
     [NSEvent addLocalMonitorForEventsMatchingMask:NSLeftMouseDraggedMask handler:^NSEvent *(NSEvent *event) {
-        NSPoint mousePoint = [self convertPoint:[event locationInWindow] toView:self];
+        NSPoint mousePoint = [self convertPoint:[event locationInWindow] fromView:nil];
         CGFloat threshold = fmax(fmin([self distanceFromStart:mousePoint] / RPInstantAlphaThresholdMaxRadius, 1.0), 0.0);
 
         if (NSEqualPoints(self.selectionCurrentPoint, mousePoint) || self.selectionThreshold == threshold) return event;
@@ -183,7 +183,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 #pragma mark - Mouse events
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] toView:self];
+    NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
     BOOL mouseInPhoto = CGRectContainsPoint([self imageFrame], mousePoint);
     if (!mouseInPhoto) return;
 
@@ -229,7 +229,7 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
 }
                                
 - (CGFloat)distanceFromStart:(NSPoint)point {
-   CGFloat distance = sqrt(pow(point.x - self.selectionStartPoint.x, 2.0) + pow(point.y - self.selectionStartPoint.y, 2.0));
+    CGFloat distance = sqrt(pow(point.x - self.selectionStartPoint.x, 2.0) + pow(point.y - self.selectionStartPoint.y, 2.0));
     return distance;
 }
 
