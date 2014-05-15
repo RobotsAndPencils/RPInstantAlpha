@@ -25,14 +25,16 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 
 @property (nonatomic, strong) NSImage *originalImage;
 
-@property (nonatomic, copy) void(^completion)(NSImage *);
+@property (nonatomic, copy) void(^completion)(NSImage *, BOOL);
 
 @property (nonatomic, strong) RPThresholdLabelView *labelView;
+@property (nonatomic, strong) id eventMonitor;
+
 @end
 
 @implementation RPInstantAlphaViewController
 
-- (instancetype)initWithImage:(NSImage *)image completion:(void(^)(NSImage *))completion {
+- (instancetype)initWithImage:(NSImage *)image completion:(void(^)(NSImage *, BOOL))completion {
     self = [super init];
     if (!self) return nil;
     
@@ -89,6 +91,24 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     
     self.view = imageView;
+    
+    self.eventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^NSEvent *(NSEvent *event) {
+        if (event.window != self.view.window) {
+            return event;
+        }
+        
+        if ([event keyCode] == 53) { // Escape
+            [self cancel];
+        }
+        else if ([event keyCode] == 36) { // Return
+            [self done];
+        }
+        return event;
+    }];
+}
+
+- (void)dealloc {
+    [NSEvent removeMonitor:self.eventMonitor];
 }
 
 #pragma mark - Private
@@ -108,7 +128,11 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 - (void)done {
     RPInstantAlphaImageView *imageView = (RPInstantAlphaImageView *)self.view;
     NSImage *image = imageView.image;
-    if (self.completion) self.completion(image);
+    if (self.completion) self.completion(image, NO);
+}
+
+- (void)cancel {
+    if (self.completion) self.completion(nil, YES);
 }
 
 @end
