@@ -21,7 +21,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     NSImage *image = [NSImage imageNamed:@"grass"];
-    self.instantAlphaViewController = [[RPInstantAlphaViewController alloc] initWithImage:image completion:^(NSImage *image) {
+    self.instantAlphaViewController = [[RPInstantAlphaViewController alloc] initWithImage:image completion:^(NSImage *image, BOOL cancelled) {
         NSLog(@"Edited image: %@", image);
     }];
     CGRect imageRect = NSMakeRect(0.0f, 0.0f, image.size.width, image.size.height);
