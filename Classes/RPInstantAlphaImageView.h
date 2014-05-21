@@ -20,4 +20,9 @@
  */
 - (instancetype)initWithFrame:(NSRect)frame selectionStarted:(void (^)(NSPoint mousePoint))selectionStarted selectionChanged:(void (^)(NSPoint mousePoint, CGFloat threshold))selectionChanged selectionEnded:(void (^)(NSImage *))selectionEnded;
 
+/**
+ *  Resets the alpha mask to reveal the entire original image
+ */
+- (void)resetAlphaMask;
+
 @end

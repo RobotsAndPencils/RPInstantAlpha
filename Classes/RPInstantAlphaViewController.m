@@ -126,6 +126,7 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 - (void)reset {
     RPInstantAlphaImageView *imageView = (RPInstantAlphaImageView *)self.view;
     imageView.image = [self.originalImage copy];
+    [imageView resetAlphaMask];
 }
 
 - (void)done {

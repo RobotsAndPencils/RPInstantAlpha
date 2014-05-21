@@ -91,6 +91,12 @@ CGFloat map(CGFloat inMin, CGFloat inMax, CGFloat outMin, CGFloat outMax, CGFloa
     _transientAlphaMask = NULL;
 }
 
+#pragma mark - Public
+
+- (void)resetAlphaMask {
+    self.alphaMask = nil;
+}
+
 #pragma mark - Properties
 
 - (void)setImage:(NSImage *)newImage {
