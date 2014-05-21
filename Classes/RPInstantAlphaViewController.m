@@ -46,16 +46,19 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 }
 
 - (void)showHUD {
-    [self.instructionsWindowController.window orderFront:nil];
     NSRect instructionsFrame = ({
         CGRect instructionsFrame = self.instructionsWindowController.window.frame;
-        CGRect windowFrame = self.view.window.frame;
-        CGFloat x = CGRectGetMinX(windowFrame) + (CGRectGetWidth(self.view.frame) - CGRectGetWidth(instructionsFrame)) / 2;
-        CGFloat y = CGRectGetMinY(windowFrame) - CGRectGetHeight(instructionsFrame) - RPInstantAlphaInstructionYPadding;
+        NSRect frameRelativeToWindow = [self.view convertRect:self.view.bounds toView:nil];
+        NSRect frameRelativeToScreen = [self.view.window convertRectToScreen:frameRelativeToWindow];
+        CGFloat x = CGRectGetMinX(frameRelativeToScreen) + (CGRectGetWidth(self.view.frame) - CGRectGetWidth(instructionsFrame)) / 2;
+        x = fmax(x, 0);
+        CGFloat y = CGRectGetMinY(frameRelativeToScreen) - CGRectGetHeight(instructionsFrame) - RPInstantAlphaInstructionYPadding;
+        y = fmax(y, 0);
         instructionsFrame.origin = CGPointMake(x, y);
         instructionsFrame;
     });
     [self.instructionsWindowController.window setFrame:instructionsFrame display:YES];
+    [self.instructionsWindowController.window orderFront:nil];
 }
 
 - (void)dismissHUD {
