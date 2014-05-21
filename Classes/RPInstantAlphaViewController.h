@@ -31,4 +31,19 @@
  */
 - (void)dismissHUD;
 
+/**
+ *  Resets the state of the view
+ */
+- (void)reset;
+
+/**
+ *  Finishes modifications and calls the completion block
+ */
+- (void)done;
+
+/**
+ *  Cancels modifications and calls the completion block
+ */
+- (void)cancel;
+
 @end
