@@ -12,6 +12,14 @@
 
 @property (nonatomic, assign) CGFloat threshold;
 
+/**
+ *  Creates a new threshold label view
+ *
+ *  @param frameRect    The frame of the view
+ *  @param cornerRadius The corner radius of the view
+ *
+ *  @return A new RPThresholdLabelView instance
+ */
 - (instancetype)initWithFrame:(NSRect)frameRect cornerRadius:(CGFloat)cornerRadius;
 
 @end
