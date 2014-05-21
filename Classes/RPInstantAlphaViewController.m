@@ -118,9 +118,9 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
 
 - (void)moveThresholdWindowToMousePoint:(NSPoint)mousePoint {
     NSPoint windowOrigin = self.view.window.frame.origin;
-    NSPoint mouseRelativeToViewPoint = NSMakePoint(mousePoint.x + windowOrigin.x, mousePoint.y + windowOrigin.y);
-    mouseRelativeToViewPoint.y -= RPInstantAlphaThresholdLabelHeight; // Align top-left corner to mouse instead of bottom-left (origin)
-    [self.thresholdLabelWindow setFrameOrigin:mouseRelativeToViewPoint];
+    NSPoint mouseRelativeToViewAndWindow = NSMakePoint(mousePoint.x + windowOrigin.x, mousePoint.y + windowOrigin.y);
+    mouseRelativeToViewAndWindow.y -= RPInstantAlphaThresholdLabelHeight; // Align top-left corner to mouse instead of bottom-left (origin)
+    [self.thresholdLabelWindow setFrameOrigin:mouseRelativeToViewAndWindow];
 }
 
 - (void)reset {
