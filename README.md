@@ -2,6 +2,7 @@
 
 Easily allow users to remove the background from an image, just like in iWork
 
+[![Build Status](https://travis-ci.org/RobotsAndPencils/RPInstantAlpha.svg)](https://travis-ci.org/RobotsAndPencils/RPInstantAlpha)
 [![Version](http://cocoapod-badges.herokuapp.com/v/RPInstantAlpha/badge.png)](http://cocoadocs.org/docsets/RPInstantAlpha)
 [![Platform](http://cocoapod-badges.herokuapp.com/p/RPInstantAlpha/badge.png)](http://cocoadocs.org/docsets/RPInstantAlpha)
 
