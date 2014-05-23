@@ -51,9 +51,7 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
         NSRect frameRelativeToWindow = [self.view convertRect:self.view.bounds toView:nil];
         NSRect frameRelativeToScreen = [self.view.window convertRectToScreen:frameRelativeToWindow];
         CGFloat x = CGRectGetMinX(frameRelativeToScreen) + (CGRectGetWidth(self.view.frame) - CGRectGetWidth(instructionsFrame)) / 2;
-        x = fmax(x, 0);
         CGFloat y = CGRectGetMinY(frameRelativeToScreen) - CGRectGetHeight(instructionsFrame) - RPInstantAlphaInstructionYPadding;
-        y = fmax(y, 0);
         instructionsFrame.origin = CGPointMake(x, y);
         instructionsFrame;
     });
@@ -82,10 +80,10 @@ const CGFloat RPInstantAlphaInstructionYPadding = 20.0;
     RPInstantAlphaImageView *imageView = [[RPInstantAlphaImageView alloc] initWithFrame:NSZeroRect selectionStarted:^(NSPoint mousePoint){
         weakSelf.labelView.threshold = 0.0;
         [weakSelf.thresholdLabelWindow makeKeyAndOrderFront:nil];
-        [weakSelf moveThresholdWindowToMousePoint:mousePoint];
+        [weakSelf moveThresholdWindowToMousePoint:[weakSelf.view.window mouseLocationOutsideOfEventStream]];
     } selectionChanged:^(NSPoint mousePoint, CGFloat threshold) {
         weakSelf.labelView.threshold = threshold;
-        [weakSelf moveThresholdWindowToMousePoint:mousePoint];
+        [weakSelf moveThresholdWindowToMousePoint:[weakSelf.view.window mouseLocationOutsideOfEventStream]];
     } selectionEnded:^(NSImage *image) {
         [weakSelf.thresholdLabelWindow close];
     }];
