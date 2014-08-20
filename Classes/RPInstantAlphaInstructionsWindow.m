@@ -53,14 +53,18 @@
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    self.currentLocation = [self convertBaseToScreen:[self mouseLocationOutsideOfEventStream]];
-    
+    NSPoint mousePoint = [self mouseLocationOutsideOfEventStream];
+    NSRect mouseLocationRect = NSMakeRect(mousePoint.x, mousePoint.y, 0, 0);
+    self.currentLocation = [self convertRectToScreen:mouseLocationRect].origin;
+
     self.offsetX = self.currentLocation.x - [self frame].origin.x;
     self.offsetY = self.currentLocation.y - [self frame].origin.y;
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent {
-    self.currentLocation = [self convertBaseToScreen:[self mouseLocationOutsideOfEventStream]];
+    NSPoint mousePoint = [self mouseLocationOutsideOfEventStream];
+    NSRect mouseLocationRect = NSMakeRect(mousePoint.x, mousePoint.y, 0, 0);
+    self.currentLocation = [self convertRectToScreen:mouseLocationRect].origin;
 
     self.newOrigin = NSMakePoint(self.currentLocation.x - self.offsetX, self.currentLocation.y - self.offsetY);
 
